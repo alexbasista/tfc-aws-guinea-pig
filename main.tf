@@ -1,5 +1,3 @@
-provider "vault" {}
-
 module "vault-aws-sts" {
   source  = "app.terraform.io/hc-implementation-services/aws-access-credentials/vault"
   version = "1.1.0"
