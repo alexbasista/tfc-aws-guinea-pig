@@ -1,6 +1,6 @@
 variable "aws_secrets_engine_name" {
   type        = string
-  description = "Name of AWS Secrets Engine where role exists"
+  description = "Name of Vault AWS Secrets Engine where Vault AWS role exists within"
 }
 
 variable "aws_secrets_engine_role" {
