@@ -58,7 +58,7 @@ resource "aws_instance" "inline" {
       connection {
           type = "ssh"
           host = self.public_ip
-          user = "root"
+          user = "ec2-user"
           port = 22
           #password =
           #private_key =
