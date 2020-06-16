@@ -59,10 +59,10 @@ resource aws_security_group ec2_allow {
 }
 
 resource aws_security_group_rule ssh {
-  type        = ingress
+  type        = "ingress"
   from_port   = 22
   to_port     = 22
-  protocol    = tcp
+  protocol    = "tcp"
   cidr_blocks = var.ssh_cidr_ingress_allow
   description = "Allow SSH ingress from these CIDR ranges."
 
@@ -70,7 +70,7 @@ resource aws_security_group_rule ssh {
 }
 
 resource aws_security_group_rule egress_allow_all {
-  type        = egress
+  type        = "egress"
   from_port   = 0
   to_port     = 0
   protocol    = -1
@@ -80,6 +80,9 @@ resource aws_security_group_rule egress_allow_all {
   security_group_id = aws_security_group.ec2_allow.id
 }
 
+#---------------------------------------------------------------------------------------------------------
+# EC2 Instances
+#---------------------------------------------------------------------------------------------------------
 resource aws_instance inline_public {
   count = var.public_subnet_id == null ? 0 : 1
   
@@ -113,9 +116,6 @@ resource aws_instance inline_public {
   }
 }
 
-#---------------------------------------------------------------------------------------------------------
-# EC2 Instances
-#---------------------------------------------------------------------------------------------------------
 resource aws_instance inline_private {
   count = var.private_subnet_id == null ? 0 : 1
   
