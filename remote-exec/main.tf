@@ -150,7 +150,7 @@ resource aws_instance inline_private {
 }
 
 resource aws_instance inline_bastion {
-  count = var.private_subnet_id == null ? 0 : 1
+  count = var.private_subnet_id != null && var.remote_exec_bastion_host != null ? 1 : 0
 
   ami                    = var.os_distro == "amzn2" ? data.aws_ami.amzn2[0].id : data.aws_ami.ubuntu[0].id
   instance_type          = "t2.micro"
@@ -161,7 +161,7 @@ resource aws_instance inline_bastion {
   provisioner remote-exec {
     connection {
       type         = "ssh"
-      bastion_host = var.remote_exec_bastion_host == null ? null : var.remote_exec_bastion_host
+      bastion_host = var.remote_exec_bastion_host
       host         = self.private_ip
       user         = var.os_distro == "amzn2" ? "ec2-user" : "ubuntu"
       port         = 22
