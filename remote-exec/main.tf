@@ -1,3 +1,6 @@
+#---------------------------------------------------------------------------------------------------------
+# AMI Data Sources
+#---------------------------------------------------------------------------------------------------------
 data aws_ami amzn2 {
   count = var.os_distro == "amzn2" ? 1 : 0
   
@@ -47,16 +50,19 @@ data aws_ami ubuntu {
   }
 }
 
+#---------------------------------------------------------------------------------------------------------
+# Security Group
+#---------------------------------------------------------------------------------------------------------
 resource aws_security_group ec2_allow {
   name   = "ec2-allow"
   vpc_id = var.vpc_id
 }
 
 resource aws_security_group_rule ssh {
-  type        = "ingress"
+  type        = ingress
   from_port   = 22
   to_port     = 22
-  protocol    = "tcp"
+  protocol    = tcp
   cidr_blocks = var.ssh_cidr_ingress_allow
   description = "Allow SSH ingress from these CIDR ranges."
 
@@ -64,10 +70,10 @@ resource aws_security_group_rule ssh {
 }
 
 resource aws_security_group_rule egress_allow_all {
-  type        = "egress"
+  type        = egress
   from_port   = 0
   to_port     = 0
-  protocol    = "-1"
+  protocol    = -1
   cidr_blocks = ["0.0.0.0/0"]
   description = "Allow all traffic outbound from EC2 instance."
 
@@ -87,13 +93,13 @@ resource aws_instance inline_public {
       connection {
           type = "ssh"
           host = self.public_ip
-          user = "ec2-user"
+          user = var.os_distro == "amzn2" ? "ec2-user" : "ubuntu"
           port = 22
           private_key = var.remote_exec_private_key
       }
       
       inline = [
-          "echo 'hello, world' > /tmp/hello_world.log",
+          "echo 'Hello, World. Remote-Exec was here.' > /tmp/hello_world.log",
       ]
   }
 
@@ -107,6 +113,9 @@ resource aws_instance inline_public {
   }
 }
 
+#---------------------------------------------------------------------------------------------------------
+# EC2 Instances
+#---------------------------------------------------------------------------------------------------------
 resource aws_instance inline_private {
   count = var.private_subnet_id == null ? 0 : 1
   
@@ -120,13 +129,13 @@ resource aws_instance inline_private {
       connection {
           type = "ssh"
           host = self.private_ip
-          user = "ec2-user"
+          user = var.os_distro == "amzn2" ? "ec2-user" : "ubuntu"
           port = 22
           private_key = var.remote_exec_private_key
       }
       
       inline = [
-          "echo 'hello, world' > /tmp/hello_world.log",
+          "echo 'Hello, World. Remote-Exec was here.' > /tmp/hello_world.log",
       ]
   }
 
