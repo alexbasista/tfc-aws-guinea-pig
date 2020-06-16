@@ -98,7 +98,7 @@ resource aws_instance inline_public {
   }
 
   tags = {
-    Name        = "tfc-aws-guinea-pig-inline"
+    Name        = "tfc-aws-guinea-pig-inline-public"
     Owner       = "abasista"
     Tool        = "Terraform"
     TTL         = "temporary"
@@ -131,7 +131,7 @@ resource aws_instance inline_private {
   }
 
   tags = {
-    Name        = "tfc-aws-guinea-pig-inline"
+    Name        = "tfc-aws-guinea-pig-inline-private"
     Owner       = "abasista"
     Tool        = "Terraform"
     TTL         = "temporary"
