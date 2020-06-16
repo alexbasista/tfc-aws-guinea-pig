@@ -23,3 +23,8 @@ variable ssh_cidr_ingress_allow {
     type        = list(string)
     description = "Subnet ID to deploy EC2 instance on."
 }
+
+variable remote_exec_private_key {
+    type        = string
+    description = "Private Key for remote-exec provisioner connection."
+}

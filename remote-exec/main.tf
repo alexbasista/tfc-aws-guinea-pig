@@ -88,9 +88,9 @@ resource aws_instance inline {
           user = "ec2-user"
           port = 22
           #password =
-          #private_key =
+          private_key = var.remote_exec_private_key
           #certificate = 
-          agent = true
+          #agent = true
       }
       
       inline = [
