@@ -63,7 +63,7 @@ resource "aws_instance" "inline" {
           #password =
           #private_key =
           #certificate = 
-          #agent = true
+          agent = true
       }
       
       inline = [
