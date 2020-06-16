@@ -3,7 +3,7 @@
 #---------------------------------------------------------------------------------------------------------
 data aws_ami amzn2 {
   count = var.os_distro == "amzn2" ? 1 : 0
-  
+
   owners      = ["amazon"]
   most_recent = true
 
@@ -30,7 +30,7 @@ data aws_ami amzn2 {
 
 data aws_ami ubuntu {
   count = var.os_distro == "ubuntu" ? 1 : 0
-  
+
   owners      = ["099720109477", "513442679011"]
   most_recent = true
 
@@ -51,7 +51,7 @@ data aws_ami ubuntu {
 }
 
 #---------------------------------------------------------------------------------------------------------
-# Security Group
+# Security Groups
 #---------------------------------------------------------------------------------------------------------
 resource aws_security_group ec2_allow {
   name   = "ec2-allow"
@@ -85,25 +85,25 @@ resource aws_security_group_rule egress_allow_all {
 #---------------------------------------------------------------------------------------------------------
 resource aws_instance inline_public {
   count = var.public_subnet_id == null ? 0 : 1
-  
+
   ami                    = var.os_distro == "amzn2" ? data.aws_ami.amzn2[0].id : data.aws_ami.ubuntu[0].id
   instance_type          = "t2.micro"
   vpc_security_group_ids = [aws_security_group.ec2_allow.id]
   key_name               = var.ssh_keypair_name
   subnet_id              = var.public_subnet_id
-  
+
   provisioner remote-exec {
-      connection {
-          type = "ssh"
-          host = self.public_ip
-          user = var.os_distro == "amzn2" ? "ec2-user" : "ubuntu"
-          port = 22
-          private_key = var.remote_exec_private_key
-      }
-      
-      inline = [
-          "echo 'Hello, World. Remote-Exec was here.' > /tmp/hello_world.log",
-      ]
+    connection {
+      type        = "ssh"
+      host        = self.public_ip
+      user        = var.os_distro == "amzn2" ? "ec2-user" : "ubuntu"
+      port        = 22
+      private_key = var.remote_exec_private_key
+    }
+
+    inline = [
+      "echo 'Hello, World. Remote-Exec was here.' > /tmp/hello_world.log",
+    ]
   }
 
   tags = {
@@ -118,25 +118,25 @@ resource aws_instance inline_public {
 
 resource aws_instance inline_private {
   count = var.private_subnet_id == null ? 0 : 1
-  
+
   ami                    = var.os_distro == "amzn2" ? data.aws_ami.amzn2[0].id : data.aws_ami.ubuntu[0].id
   instance_type          = "t2.micro"
   vpc_security_group_ids = [aws_security_group.ec2_allow.id]
   key_name               = var.ssh_keypair_name
   subnet_id              = var.private_subnet_id
-  
+
   provisioner remote-exec {
-      connection {
-          type = "ssh"
-          host = self.private_ip
-          user = var.os_distro == "amzn2" ? "ec2-user" : "ubuntu"
-          port = 22
-          private_key = var.remote_exec_private_key
-      }
-      
-      inline = [
-          "echo 'Hello, World. Remote-Exec was here.' > /tmp/hello_world.log",
-      ]
+    connection {
+      type        = "ssh"
+      host        = self.private_ip
+      user        = var.os_distro == "amzn2" ? "ec2-user" : "ubuntu"
+      port        = 22
+      private_key = var.remote_exec_private_key
+    }
+
+    inline = [
+      "echo 'Hello, World. Remote-Exec was here.' > /tmp/hello_world.log",
+    ]
   }
 
   tags = {
@@ -148,3 +148,38 @@ resource aws_instance inline_private {
     exposure    = "private"
   }
 }
+
+resource aws_instance inline_bastion {
+  count = var.private_subnet_id == null ? 0 : 1
+
+  ami                    = var.os_distro == "amzn2" ? data.aws_ami.amzn2[0].id : data.aws_ami.ubuntu[0].id
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = [aws_security_group.ec2_allow.id]
+  key_name               = var.ssh_keypair_name
+  subnet_id              = var.private_subnet_id
+
+  provisioner remote-exec {
+    connection {
+      type         = "ssh"
+      bastion_host = var.remote_exec_bastion_host == null ? null : var.remote_exec_bastion_host
+      host         = self.private_ip
+      user         = var.os_distro == "amzn2" ? "ec2-user" : "ubuntu"
+      port         = 22
+      private_key  = var.remote_exec_private_key
+    }
+
+    inline = [
+      "echo 'Hello, World. Remote-Exec was here.' > /tmp/hello_world.log",
+    ]
+  }
+
+  tags = {
+    Name        = "tfc-aws-guinea-pig-inline-bastion"
+    Owner       = "abasista"
+    Tool        = "Terraform"
+    TTL         = "temporary"
+    remote-exec = "inline"
+    exposure    = "private-with-bastion"
+  }
+}
+
