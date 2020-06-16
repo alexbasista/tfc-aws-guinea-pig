@@ -41,3 +41,9 @@ variable remote_exec_bastion_host {
   description = "Bastion host to connect to for remote-exec provisioner connection."
   default     = null
 }
+
+variable remote_exec_bastion_user {
+  type        = string
+  description = "Bastion host to connect to for remote-exec provisioner connection."
+  default     = "ec2-user"
+}

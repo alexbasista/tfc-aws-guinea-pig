@@ -162,6 +162,7 @@ resource aws_instance inline_bastion {
     connection {
       type         = "ssh"
       bastion_host = var.remote_exec_bastion_host
+      bastion_user = var.remote_exec_bastion_user
       host         = self.private_ip
       user         = var.os_distro == "amzn2" ? "ec2-user" : "ubuntu"
       port         = 22
