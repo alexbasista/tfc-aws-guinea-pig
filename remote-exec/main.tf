@@ -130,7 +130,8 @@ resource aws_instance inline_private {
       connection {
           type = "ssh"
           host = self.private_ip
-          user = var.os_distro == "amzn2" ? "ec2-user" : "ubuntu"
+          #user = var.os_distro == "amzn2" ? "ec2-user" : "ubuntu"
+          user = "root"
           port = 22
           private_key = var.remote_exec_private_key
       }
