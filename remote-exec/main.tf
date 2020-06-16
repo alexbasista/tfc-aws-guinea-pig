@@ -55,6 +55,17 @@ resource "aws_instance" "inline" {
   subnet_id              = var.subnet_id
   
   provisioner "remote-exec" {
+      connection {
+          type = "ssh"
+          host = self.public_ip
+          user = "root"
+          port = 22
+          #password =
+          #private_key =
+          #certificate = 
+          #agent = true
+      }
+      
       inline = [
           "echo 'hello, world' > /tmp/hello_world.log",
       ]
