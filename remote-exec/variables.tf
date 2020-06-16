@@ -1,3 +1,8 @@
+variable vpc_id {
+    type        = string
+    description = "VPC to deploy EC2 instance and Security Group in."
+}
+
 variable os_distro {
     type        = string
     description = "Operating System distribution (amzn2, ubuntu)."
@@ -14,7 +19,7 @@ variable subnet_id {
     description = "Subnet ID to deploy EC2 instance on."
 }
 
-variable vpc_security_group_ids {
+variable ssh_cidr_ingress_allow {
     type        = list(string)
-    description = "Security Group IDs to attach to EC2 instance."
+    description = "Subnet ID to deploy EC2 instance on."
 }
