@@ -14,9 +14,16 @@ variable ssh_keypair_name {
     description = "Name of existing SSH Key Pair to attach to EC2 instance."
 }
 
-variable subnet_id {
+variable public_subnet_id {
     type        = string
-    description = "Subnet ID to deploy EC2 instance on."
+    description = "Public Subnet ID to deploy EC2 instance on."
+    default     = null
+}
+
+variable private_subnet_id {
+    type        = string
+    description = "Private Subnet ID to deploy EC2 instance on."
+    default     = null
 }
 
 variable ssh_cidr_ingress_allow {

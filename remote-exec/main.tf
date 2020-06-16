@@ -74,12 +74,14 @@ resource aws_security_group_rule egress_allow_all {
   security_group_id = aws_security_group.ec2_allow.id
 }
 
-resource aws_instance inline {
+resource aws_instance inline_public {
+  count = var.public_subnet_id == null ? 0 : 1
+  
   ami                    = var.os_distro == "amzn2" ? data.aws_ami.amzn2[0].id : data.aws_ami.ubuntu[0].id
   instance_type          = "t2.micro"
   vpc_security_group_ids = [aws_security_group.ec2_allow.id]
   key_name               = var.ssh_keypair_name
-  subnet_id              = var.subnet_id
+  subnet_id              = var.public_subnet_id
   
   provisioner remote-exec {
       connection {
@@ -87,10 +89,7 @@ resource aws_instance inline {
           host = self.public_ip
           user = "ec2-user"
           port = 22
-          #password =
           private_key = var.remote_exec_private_key
-          #certificate = 
-          #agent = true
       }
       
       inline = [
@@ -104,5 +103,39 @@ resource aws_instance inline {
     Tool        = "Terraform"
     TTL         = "temporary"
     remote-exec = "inline"
+    exposure    = "public"
+  }
+}
+
+resource aws_instance inline_private {
+  count = var.private_subnet_id == null ? 0 : 1
+  
+  ami                    = var.os_distro == "amzn2" ? data.aws_ami.amzn2[0].id : data.aws_ami.ubuntu[0].id
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = [aws_security_group.ec2_allow.id]
+  key_name               = var.ssh_keypair_name
+  subnet_id              = var.private_subnet_id
+  
+  provisioner remote-exec {
+      connection {
+          type = "ssh"
+          host = self.private_ip
+          user = "ec2-user"
+          port = 22
+          private_key = var.remote_exec_private_key
+      }
+      
+      inline = [
+          "echo 'hello, world' > /tmp/hello_world.log",
+      ]
+  }
+
+  tags = {
+    Name        = "tfc-aws-guinea-pig-inline"
+    Owner       = "abasista"
+    Tool        = "Terraform"
+    TTL         = "temporary"
+    remote-exec = "inline"
+    exposure    = "private"
   }
 }
