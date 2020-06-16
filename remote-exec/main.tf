@@ -47,19 +47,24 @@ data "aws_ami" "ubuntu" {
   }
 }
 
-resource "aws_instance" "web" {
-  ami           = var.os_distro == "amzn2" ? data.aws_ami.amzn2[0].id : data.aws_ami.ubuntu[0].id
-  instance_type = "t2.micro"
-  key_name      = var.ssh_keypair_name
-  
-  subnet_id = var.subnet_id
-  
+resource "aws_instance" "inline" {
+  ami                    = var.os_distro == "amzn2" ? data.aws_ami.amzn2[0].id : data.aws_ami.ubuntu[0].id
+  instance_type          = "t2.micro"
   vpc_security_group_ids = var.vpc_security_group_ids
+  key_name               = var.ssh_keypair_name
+  subnet_id              = var.subnet_id
+  
+  provisioner "remote-exec" {
+      inline = [
+          "echo 'hello, world' > /tmp/hello_world.log",
+      ]
+  }
 
   tags = {
-    Name  = "tfc-aws-guinea-pig"
-    Owner = "abasista"
-    Tool  = "Terraform"
-    TTL   = "temporary"
+    Name        = "tfc-aws-guinea-pig"
+    Owner       = "abasista"
+    Tool        = "Terraform"
+    TTL         = "temporary"
+    remote-exec = "inline"
   }
 }
