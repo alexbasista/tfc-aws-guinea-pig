@@ -110,9 +110,7 @@ resource aws_instance inline_public {
   tags = merge(
     {
       "Name"        = "tfc-aws-guinea-pig-inline-public"
-      "Owner"       = "abasista"
       "Tool"        = "Terraform"
-      "TTL"         = "temporary"
       "remote-exec" = "inline"
       "exposure"    = "public"
     },
@@ -146,9 +144,7 @@ resource aws_instance inline_private {
   tags = merge(
     {
       "Name"        = "tfc-aws-guinea-pig-inline-private"
-      "Owner"       = "abasista"
       "Tool"        = "Terraform"
-      "TTL"         = "temporary"
       "remote-exec" = "inline"
       "exposure"    = "private"
     },
@@ -184,9 +180,7 @@ resource aws_instance inline_bastion {
   tags = merge(
     {
       "Name"        = "tfc-aws-guinea-pig-inline-bastion"
-      "Owner"       = "abasista"
       "Tool"        = "Terraform"
-      "TTL"         = "temporary"
       "remote-exec" = "inline"
       "exposure"    = "private-with-bastion"
     },
@@ -222,9 +216,7 @@ resource aws_instance script_private {
   tags = merge(
     {
       Name        = "tfc-aws-guinea-pig-inline-bastion"
-      Owner       = "abasista"
       Tool        = "Terraform"
-      TTL         = "temporary"
       remote-exec = "inline"
       exposure    = "private-with-bastion"
     },
