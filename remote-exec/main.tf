@@ -56,6 +56,7 @@ data aws_ami ubuntu {
 resource aws_security_group ec2_allow {
   name   = "ec2-allow"
   vpc_id = var.vpc_id
+  tags   = merge({ "Name" = "ec2-allow" }, var.common_tags)
 }
 
 resource aws_security_group_rule ssh {
@@ -106,14 +107,17 @@ resource aws_instance inline_public {
     ]
   }
 
-  tags = {
-    Name        = "tfc-aws-guinea-pig-inline-public"
-    Owner       = "abasista"
-    Tool        = "Terraform"
-    TTL         = "temporary"
-    remote-exec = "inline"
-    exposure    = "public"
-  }
+  tags = merge(
+    {
+      "Name"        = "tfc-aws-guinea-pig-inline-public"
+      "Owner"       = "abasista"
+      "Tool"        = "Terraform"
+      "TTL"         = "temporary"
+      "remote-exec" = "inline"
+      "exposure"    = "public"
+    },
+    var.common_tags
+  )
 }
 
 resource aws_instance inline_private {
@@ -139,14 +143,17 @@ resource aws_instance inline_private {
     ]
   }
 
-  tags = {
-    Name        = "tfc-aws-guinea-pig-inline-private"
-    Owner       = "abasista"
-    Tool        = "Terraform"
-    TTL         = "temporary"
-    remote-exec = "inline"
-    exposure    = "private"
-  }
+  tags = merge(
+    {
+      "Name"        = "tfc-aws-guinea-pig-inline-private"
+      "Owner"       = "abasista"
+      "Tool"        = "Terraform"
+      "TTL"         = "temporary"
+      "remote-exec" = "inline"
+      "exposure"    = "private"
+    },
+    var.common_tags
+  )
 }
 
 resource aws_instance inline_bastion {
@@ -174,13 +181,54 @@ resource aws_instance inline_bastion {
     ]
   }
 
-  tags = {
-    Name        = "tfc-aws-guinea-pig-inline-bastion"
-    Owner       = "abasista"
-    Tool        = "Terraform"
-    TTL         = "temporary"
-    remote-exec = "inline"
-    exposure    = "private-with-bastion"
+  tags = merge(
+    {
+      "Name"        = "tfc-aws-guinea-pig-inline-bastion"
+      "Owner"       = "abasista"
+      "Tool"        = "Terraform"
+      "TTL"         = "temporary"
+      "remote-exec" = "inline"
+      "exposure"    = "private-with-bastion"
+    },
+    var.common_tags
+  )
+}
+
+resource aws_instance script_private {
+  count = var.private_subnet_id != null && var.remote_exec_bastion_host != null ? 1 : 0
+
+  ami                    = var.os_distro == "amzn2" ? data.aws_ami.amzn2[0].id : data.aws_ami.ubuntu[0].id
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = [aws_security_group.ec2_allow.id]
+  key_name               = var.ssh_keypair_name
+  subnet_id              = var.private_subnet_id
+
+  provisioner remote-exec {
+    connection {
+      type         = "ssh"
+      bastion_host = var.remote_exec_bastion_host
+      bastion_user = var.remote_exec_bastion_user
+      host         = self.private_ip
+      user         = var.os_distro == "amzn2" ? "ec2-user" : "ubuntu"
+      port         = 22
+      private_key  = var.remote_exec_private_key
+    }
+
+    inline = [
+      "echo 'Hello, World. Remote-Exec was here.' > /tmp/hello_world.log",
+    ]
   }
+
+  tags = merge(
+    {
+      Name        = "tfc-aws-guinea-pig-inline-bastion"
+      Owner       = "abasista"
+      Tool        = "Terraform"
+      TTL         = "temporary"
+      remote-exec = "inline"
+      exposure    = "private-with-bastion"
+    },
+    var.common_tags
+  )
 }
 
